@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Political CRM</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+  <div class="logo">P-CRM</div>
+
+  <div class="menu-toggle" onclick="toggleMenu()">
+    ☰
+  </div>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#complaintFormSection">Submit</a></li>
+    <li><a href="#trackSection">Track</a></li>
+    <li><a href="admin.html">Admin</a></li>
+    <li><button onclick="toggleTheme()">🌙</button></li>
+    <li><button id="loginBtn" onclick="toggleLogin()">Login</button></li>
+  </ul>
+</nav>
+<div class="modal" id="loginModal">
+  <div class="modal-content">
+    <h2>Admin Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <button onclick="closeModal()">Close</button>
+  </div>
+</div>
+<section class="hero">
+  <h1>Smart Political CRM</h1>
+  <p>Digital Governance Made Transparent & Efficient</p>
+  <button onclick="document.getElementById('complaintFormSection').scrollIntoView({behavior:'smooth'})">
+    Raise Complaint
+  </button>
+</section>
+
+  <header>
+    <h1>Smart Political CRM (P-CRM)</h1>
+  </header>
+
+  <div class="container">
+
+
+    <!-- Complaint Form -->
+    <div class="card">
+      <h2>Submit Complaint</h2>
+      <form id="complaintForm">
+        <div class="card" id="complaintFormSection"></div>
+        <input type="text" id="name" placeholder="Your Name" required>
+        <input type="text" id="mobile" placeholder="Mobile Number" required>
+        <input type="text" id="area" placeholder="Area" required>
+        <textarea id="description" placeholder="Describe your issue" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+      <p id="trackingId"></p>
+    </div>
+
+    <!-- Track Complaint -->
+    <div class="card">
+      <h2>Track Complaint</h2>
+      <div class="card" id="trackSection"></div>
+      <input type="text" id="trackInput" placeholder="Enter Tracking ID">
+      <button onclick="trackComplaint()">Check Status</button>
+      <p id="statusResult"></p>
+    </div>
+
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>
