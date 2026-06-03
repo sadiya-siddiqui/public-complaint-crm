@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — P-CRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="admin-body">
+
+<!-- ══════════════════════════════════════════
+     LOGIN GATE
+     ══════════════════════════════════════════ -->
+<div id="loginGate" class="login-gate">
+  <canvas id="loginCanvas"></canvas>
+  <div class="login-box">
+    <div class="login-logo">⚡ P-CRM</div>
+    <h2>Admin Login</h2>
+    <p class="login-sub">Restricted access — authorised personnel only</p>
+
+    <div id="loginError" class="login-error hidden">❌ Invalid credentials. Please try again.</div>
+
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Enter username" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="pw-toggle" type="button" onclick="togglePw(this)">👁</button>
+      </div>
+    </div>
+
+    <button class="cta-btn" style="width:100%;justify-content:center;margin-top:8px" onclick="doLogin()">
+      Login to Dashboard
+    </button>
+    <a href="index.html" class="back-home">← Back to Home</a>
+    <!-- <p class="login-hint">Demo credentials: <strong>admin</strong> / <strong>admin123</strong></p> -->
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ADMIN DASHBOARD
+     ══════════════════════════════════════════ -->
+<div id="adminDash" class="hidden">
+
+  <!-- Navbar -->
+  <nav class="navbar admin-nav">
+    <div class="logo">
+      <span class="logo-bolt">⚡</span>
+      <span class="logo-text">P-CRM</span>
+      <span class="admin-badge">Admin</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="nav-link">← Home</a></li>
+      <li>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </li>
+      <li><button class="logout-btn" onclick="doLogout()">🚪 Logout</button></li>
+    </ul>
+  </nav>
+
+  <!-- Header -->
+  <div class="admin-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Welcome back, <strong id="adminWelcomeName">Admin</strong> 👋 &nbsp;·&nbsp; <span id="adminDateTime"></span></p>
+    </div>
+    <div class="admin-header-stats">
+      <div class="mini-stat">
+        <span id="totalCount">—</span>
+        <label>Total</label>
+      </div>
+      <div class="mini-stat pending">
+        <span id="pendingCount">—</span>
+        <label>Pending</label>
+      </div>
+      <div class="mini-stat resolved">
+        <span id="resolvedCount">—</span>
+        <label>Resolved</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="admin-container">
+
+    <!-- Complaints Table -->
+    <div class="admin-card wide">
+      <div class="card-header">
+        <h2>All Complaints</h2>
+        <div class="filter-row">
+          <input type="text" id="searchInput" placeholder="🔍 Search name, area…" oninput="filterTable()">
+          <select id="statusFilter" onchange="filterTable()">
+            <option value="all">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="complaintTable">
+          <thead>
+            <tr>
+              <th>Tracking ID</th>
+              <th>Name</th>
+              <th>Area</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="complaintBody"></tbody>
+        </table>
+        <div id="noData" class="no-data hidden">📭 No complaints found.</div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+
+      <!-- Doughnut Chart -->
+      <div class="admin-card chart-card">
+        <h2>Status Overview</h2>
+        <div class="chart-container">
+          <canvas id="myChart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>Pending</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#34d399"></span>Resolved</div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="admin-card quick-stats-card">
+        <h2>Category Breakdown</h2>
+        <div id="categoryStats" class="category-list"></div>
+      </div>
+
+    </div>
+
+  </div>
+</div><!-- end adminDash -->
+
+<script>
+/* ════════════════════════════════════════════
+   THEME (synced with main site)
+   ════════════════════════════════════════════ */
+(function initTheme() {
+  const saved = localStorage.getItem('pcrm-theme') || 'dark';
+  applyTheme(saved);
+})();
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem('pcrm-theme', next);
+  if (chartInstance) renderChart(allComplaints);
+}
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.querySelectorAll('.theme-icon').forEach(el => {
+    el.textContent = theme === 'dark' ? '🌙' : '☀️';
+  });
+}
+
+/* ════════════════════════════════════════════
+   LOGIN CANVAS ANIMATION
+   ════════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('loginCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let pts = [];
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  for (let i = 0; i < 90; i++) pts.push({
+    x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+    r: Math.random() * 1.8 + 0.4,
+    dx: (Math.random() - 0.5) * 0.45,
+    dy: (Math.random() - 0.5) * 0.45,
+    o: Math.random() * 0.45 + 0.1
+  });
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const color = isDark ? '56,189,248' : '3,105,161';
+    pts.forEach((a, i) => {
+      pts.slice(i + 1).forEach(b => {
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < 140) {
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(${color},${0.14*(1-d/140)})`;
+          ctx.lineWidth = 0.8; ctx.stroke();
+        }
+      });
+      ctx.beginPath();
+      ctx.arc(a.x, a.y, a.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${color},${a.o})`;
+      ctx.fill();
+      a.x += a.dx; a.y += a.dy;
+      if (a.x < 0 || a.x > canvas.width) a.dx *= -1;
+      if (a.y < 0 || a.y > canvas.height) a.dy *= -1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ════════════════════════════════════════════
+   AUTH
+   ════════════════════════════════════════════ */
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "admin123";
+const API = "http://localhost:5000/api/complaints";
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    sessionStorage.setItem('pcrm_admin', '1');
+    sessionStorage.setItem('pcrm_admin_name', u);
+    showDash();
+  } else {
+    err.classList.remove('hidden');
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginUser').focus();
+    setTimeout(() => err.classList.add('hidden'), 4000);
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('pcrm_admin');
+  document.getElementById('adminDash').classList.add('hidden');
+  document.getElementById('loginGate').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function showDash() {
+  document.getElementById('loginGate').style.display = 'none';
+  document.getElementById('adminDash').classList.remove('hidden');
+  const name = sessionStorage.getItem('pcrm_admin_name') || 'Admin';
+  document.getElementById('adminWelcomeName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  updateClock();
+  setInterval(updateClock, 1000);
+  loadComplaints();
+}
+
+function updateClock() {
+  const el = document.getElementById('adminDateTime');
+  if (el) el.textContent = new Date().toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' });
+}
+
+function togglePw(btn) {
+  const pw = document.getElementById('loginPass');
+  pw.type = pw.type === 'password' ? 'text' : 'password';
+  btn.textContent = pw.type === 'password' ? '👁' : '🙈';
+}
+
+// Auto-login if session active
+if (sessionStorage.getItem('pcrm_admin') === '1') showDash();
+
+/* ════════════════════════════════════════════
+   COMPLAINTS DATA
+   ════════════════════════════════════════════ */
+let allComplaints = [];
+let chartInstance = null;
+
+const DEMO_DATA = [
+  { _id:'1', trackingId:'PCRM83412001', name:'Rahul Sharma', area:'Bijnor City', description:'Road near market is heavily damaged with deep potholes causing accidents daily.', status:'Pending' },
+  { _id:'2', trackingId:'PCRM83412002', name:'Sunita Devi', area:'Nagina', description:'No water supply for 4 days. Entire colony affected.', status:'Resolved' },
+  { _id:'3', trackingId:'PCRM83412003', name:'Amit Kumar', area:'Chandpur', description:'Street lights not working on main road. Robberies at night.', status:'Pending' },
+  { _id:'4', trackingId:'PCRM83412004', name:'Priya Singh', area:'Bijnor City', description:'Garbage not collected for 2 weeks. Disease spreading in area.', status:'Pending' },
+  { _id:'5', trackingId:'PCRM83412005', name:'Mohd. Arif', area:'Seohara', description:'Frequent power cuts 10-12 hours daily. Affecting students and businesses.', status:'Resolved' },
+  { _id:'6', trackingId:'PCRM83412006', name:'Geeta Rani', area:'Najibabad', description:'Drainage blocked causing waterlogging after every rain.', status:'Pending' },
+  { _id:'7', trackingId:'PCRM83412007', name:'Vikas Tyagi', area:'Dhampur', description:'No school bus route. Children walking 5km daily.', status:'Resolved' },
+  { _id:'8', trackingId:'PCRM83412008', name:'Kiran Bala', area:'Afzalgarh', description:'Broken water pipeline leaking for 3 weeks. No action taken.', status:'Pending' },
+];
+
+async function loadComplaints() {
+  try {
+    const res = await fetch(API);
+    if (!res.ok) throw new Error();
+    allComplaints = await res.json();
+  } catch {
+    allComplaints = DEMO_DATA;
+  }
+  renderTable(allComplaints);
+  renderChart(allComplaints);
+  updateCounts(allComplaints);
+  renderCategories(allComplaints);
+}
+
+function updateCounts(data) {
+  document.getElementById('totalCount').textContent = data.length;
+  document.getElementById('pendingCount').textContent = data.filter(c => c.status === 'Pending').length;
+  document.getElementById('resolvedCount').textContent = data.filter(c => c.status === 'Resolved').length;
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('complaintBody');
+  tbody.innerHTML = '';
+  const noData = document.getElementById('noData');
+  noData.classList.toggle('hidden', data.length > 0);
+
+  data.forEach((c, i) => {
+    const tr = document.createElement('tr');
+    tr.className = 'table-row-anim';
+    tr.style.animationDelay = `${i * 0.04}s`;
+    const desc = c.description || '—';
+    const shortDesc = desc.length > 48 ? desc.slice(0, 48) + '…' : desc;
+    tr.innerHTML = `
+      <td><code class="tid">${c.trackingId}</code></td>
+      <td style="color:var(--text);font-weight:500">${c.name}</td>
+      <td>${c.area}</td>
+      <td class="desc-cell" title="${desc.replace(/"/g,"'")}">${shortDesc}</td>
+      <td><span class="status-badge ${c.status==='Resolved'?'badge-resolved':'badge-pending'}">${c.status}</span></td>
+      <td>${c.status==='Pending'
+        ? `<button class="resolve-btn" onclick="markResolved('${c._id}',this)">✅ Resolve</button>`
+        : `<span class="done-label">✓ Done</span>`}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderChart(data) {
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  const pending = data.filter(c => c.status === 'Pending').length;
+  const resolved = data.filter(c => c.status === 'Resolved').length;
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(document.getElementById('myChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Pending', 'Resolved'],
+      datasets: [{
+        data: [pending, resolved],
+        backgroundColor: ['#fbbf24', '#34d399'],
+        borderColor: [isDark ? '#111827' : '#fff', isDark ? '#111827' : '#fff'],
+        borderWidth: 3,
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '70%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.raw} (${Math.round(ctx.raw/data.length*100)||0}%)`
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderCategories(data) {
+  const keywords = {
+    '🚧 Roads': ['road','pothole','broken','highway','footpath'],
+    '💧 Water': ['water','pipeline','supply','tap','drain'],
+    '🗑️ Sanitation': ['garbage','waste','trash','sanitation','clean'],
+    '💡 Electricity': ['power','light','electricity','current','wiring'],
+    '🌊 Drainage': ['waterlog','flood','drain','sewage','overflow'],
+    '📦 Other': [],
+  };
+  const counts = {};
+  Object.keys(keywords).forEach(k => counts[k] = 0);
+  data.forEach(c => {
+    const text = ((c.description || '') + ' ' + (c.area || '')).toLowerCase();
+    let matched = false;
+    for (const [cat, words] of Object.entries(keywords)) {
+      if (cat === '📦 Other') continue;
+      if (words.some(w => text.includes(w))) { counts[cat]++; matched = true; break; }
+    }
+    if (!matched) counts['📦 Other']++;
+  });
+  const el = document.getElementById('categoryStats');
+  el.innerHTML = Object.entries(counts).map(([cat, count]) => {
+    if (!count) return '';
+    const pct = data.length ? Math.round(count / data.length * 100) : 0;
+    return `
+      <div class="cat-row">
+        <span class="cat-label">${cat}</span>
+        <div class="cat-bar-wrap">
+          <div class="cat-bar" style="width:${pct}%"></div>
+        </div>
+        <span class="cat-count">${count}</span>
+      </div>`;
+  }).join('');
+}
+
+async function markResolved(id, btn) {
+  btn.disabled = true;
+  btn.textContent = '⏳…';
+  try {
+    await fetch(API + '/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'Resolved' })
+    });
+  } catch {}
+  const c = allComplaints.find(x => x._id === id);
+  if (c) c.status = 'Resolved';
+  renderTable(filterData());
+  renderChart(allComplaints);
+  updateCounts(allComplaints);
+  renderCategories(allComplaints);
+}
+
+function filterData() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  return allComplaints.filter(c => {
+    const matchText = (c.name||'').toLowerCase().includes(search) || (c.area||'').toLowerCase().includes(search) || (c.trackingId||'').toLowerCase().includes(search);
+    const matchStatus = status === 'all' || c.status === status;
+    return matchText && matchStatus;
+  });
+}
+function filterTable() { renderTable(filterData()); }
+</script>
+
+<style>
+/* Admin-only extra styles */
+.admin-sidebar { display: flex; flex-direction: column; gap: 24px; }
+.chart-card .chart-container { height: 200px; margin-bottom: 16px; }
+.chart-legend { display: flex; gap: 20px; justify-content: center; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text2); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+.quick-stats-card {}
+.category-list { display: flex; flex-direction: column; gap: 12px; }
+.cat-row { display: flex; align-items: center; gap: 10px; }
+.cat-label { font-size: 12px; color: var(--text2); min-width: 110px; }
+.cat-bar-wrap { flex: 1; height: 7px; background: var(--surface2); border-radius: 10px; overflow: hidden; }
+.cat-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 10px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+.cat-count { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text); min-width: 20px; text-align: right; }
+
+@media (max-width: 900px) {
+  .admin-container { grid-template-columns: 1fr !important; }
+  .admin-sidebar { flex-direction: row; flex-wrap: wrap; }
+  .admin-sidebar .admin-card { flex: 1; min-width: 260px; }
+}
+</style>
+</body>
+</html>

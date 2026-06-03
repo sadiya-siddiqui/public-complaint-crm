@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P-CRM — Smart Political CRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar" id="navbar">
+  <div class="logo">
+    <span class="logo-bolt">⚡</span>
+    <span class="logo-text">P-CRM</span>
+  </div>
+  <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home" class="nav-link">Home</a></li>
+    <li><a href="#problems" class="nav-link">Issues</a></li>
+    <li><a href="#complaintFormSection" class="nav-link">Submit</a></li>
+    <li><a href="#trackSection" class="nav-link">Track</a></li>
+    <li><a href="admin.html" class="nav-link">Admin</a></li>
+    <li>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+    </li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero" id="home">
+  <div class="hero-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-chip">
+      <span class="chip-dot"></span>
+      Digital Governance Platform · Uttar Pradesh
+    </div>
+    <h1 class="hero-title">
+      <span class="ht-line">Your Voice.</span>
+      <span class="ht-line ht-grad">Your Rights.</span>
+      <span class="ht-line">Our Mission.</span>
+    </h1>
+    <p class="hero-desc">Submit civic complaints, track resolutions in real-time, and hold local government accountable — all in one place.</p>
+    <div class="hero-actions">
+      <button class="cta-btn" onclick="smoothScroll('complaintFormSection')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        File a Complaint
+      </button>
+      <button class="cta-ghost" onclick="smoothScroll('trackSection')">🔍 Track Status</button>
+    </div>
+  </div>
+  <div class="hero-counters">
+    <div class="counter-card">
+      <span class="counter-val" data-target="3248">0</span>
+      <span class="counter-unit">+</span>
+      <span class="counter-label">Complaints Submitted</span>
+    </div>
+    <div class="counter-sep"></div>
+    <div class="counter-card">
+      <span class="counter-val" data-target="87">0</span>
+      <span class="counter-unit">%</span>
+      <span class="counter-label">Resolution Rate</span>
+    </div>
+    <div class="counter-sep"></div>
+    <div class="counter-card">
+      <span class="counter-val" data-target="52">0</span>
+      <span class="counter-unit">+</span>
+      <span class="counter-label">Areas Covered</span>
+    </div>
+    <div class="counter-sep"></div>
+    <div class="counter-card">
+      <span class="counter-val" data-target="24">0</span>
+      <span class="counter-unit">h</span>
+      <span class="counter-label">Avg. Response Time</span>
+    </div>
+  </div>
+  <div class="hero-scroll" onclick="smoothScroll('problems')">
+    <div class="scroll-wheel"></div>
+    <span>Scroll to explore</span>
+  </div>
+</section>
+
+<!-- ── PROBLEMS GALLERY ── -->
+<section class="problems-section" id="problems">
+  <div class="section-eyebrow">Real Issues · Real People</div>
+  <h2 class="section-heading">Problems Faced by Citizens</h2>
+  <p class="section-sub">These aren't statistics — they're real daily struggles. P-CRM exists to fix them.</p>
+
+  <div class="problems-grid">
+
+    <div class="prob-card" style="--c:#ef4444">
+      <div class="prob-img-wrap">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pothole_in_Austin%2C_Texas.jpg/640px-Pothole_in_Austin%2C_Texas.jpg"
+             onerror="this.src='https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80'"
+             alt="Broken Roads" class="prob-img" loading="lazy">
+        <div class="prob-overlay"></div>
+        <div class="prob-tag">🚧 Infrastructure</div>
+      </div>
+      <div class="prob-body">
+        <h3>Broken Roads & Potholes</h3>
+        <p>Dangerous roads cause accidents, damage vehicles, and slow down daily commutes for thousands.</p>
+        <div class="prob-stat"><span class="prob-count">842</span> complaints this month</div>
+        <button class="prob-cta" onclick="fillComplaint('Broken roads and potholes causing accidents and vehicle damage.')">Report This →</button>
+      </div>
+    </div>
+
+    <div class="prob-card featured" style="--c:#3b82f6">
+      <div class="prob-img-wrap">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Dry_tap.jpg/640px-Dry_tap.jpg"
+             onerror="this.src='https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80'"
+             alt="No Water" class="prob-img" loading="lazy">
+        <div class="prob-overlay"></div>
+        <div class="prob-tag">💧 Water Supply</div>
+      </div>
+      <div class="prob-body">
+        <h3>No Water Supply</h3>
+        <p>Families go days without clean drinking water due to pipeline failures and administrative neglect.</p>
+        <div class="prob-stat"><span class="prob-count">1,203</span> complaints this month</div>
+        <button class="prob-cta" onclick="fillComplaint('No water supply for multiple days, causing hardship for the entire area.')">Report This →</button>
+      </div>
+    </div>
+
+    <div class="prob-card" style="--c:#f59e0b">
+      <div class="prob-img-wrap">
+        <img src="https://images.unsplash.com/photo-1710313168742-737a60e5f46d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHVuY29sbGVjdGVkJTIwZ2FyYmFnZXxlbnwwfHwwfHx8MA%3D%3D"
+             onerror="this.src='https://images.unsplash.com/photo-1591193686104-fddba4f8d6b6?w=600&q=80'"
+             alt="Garbage" class="prob-img" loading="lazy">
+        <div class="prob-overlay"></div>
+        <div class="prob-tag">🗑️ Sanitation</div>
+      </div>
+      <div class="prob-body">
+        <h3>Uncollected Garbage</h3>
+        <p>Overflowing waste dumps breed disease, foul odors, and environmental hazards in residential areas.</p>
+        <div class="prob-stat"><span class="prob-count">617</span> complaints this month</div>
+        <button class="prob-cta" onclick="fillComplaint('Garbage not being collected regularly, causing sanitation and health issues.')">Report This →</button>
+      </div>
+    </div>
+
+    <div class="prob-card" style="--c:#8b5cf6">
+      <div class="prob-img-wrap">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Street_light_in_Japan.jpg/640px-Street_light_in_Japan.jpg"
+             onerror="this.src='https://images.unsplash.com/photo-1584467541268-b040f83be3fd?w=600&q=80'"
+             alt="Street Light" class="prob-img" loading="lazy">
+        <div class="prob-overlay"></div>
+        <div class="prob-tag">💡 Street Lights</div>
+      </div>
+      <div class="prob-body">
+        <h3>Broken Street Lights</h3>
+        <p>Dark roads at night create safety hazards, enabling theft and making commute dangerous.</p>
+        <div class="prob-stat"><span class="prob-count">389</span> complaints this month</div>
+        <button class="prob-cta" onclick="fillComplaint('Street lights not working, creating safety and security risks at night.')">Report This →</button>
+      </div>
+    </div>
+
+    <div class="prob-card" style="--c:#10b981">
+      <div class="prob-img-wrap">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Waterlogging_in_Delhi.jpg/640px-Waterlogging_in_Delhi.jpg"
+             onerror="this.src='https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=600&q=80'"
+             alt="Waterlogging" class="prob-img" loading="lazy">
+        <div class="prob-overlay"></div>
+        <div class="prob-tag">🌊 Drainage</div>
+      </div>
+      <div class="prob-body">
+        <h3>Waterlogging & Floods</h3>
+        <p>Clogged drains cause waterlogging after rain, damaging property and spreading diseases.</p>
+        <div class="prob-stat"><span class="prob-count">271</span> complaints this month</div>
+        <button class="prob-cta" onclick="fillComplaint('Severe waterlogging and drainage failure causing property damage and health risks.')">Report This →</button>
+      </div>
+    </div>
+
+    <div class="prob-card" style="--c:#ec4899">
+      <div class="prob-img-wrap">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Power_outage.jpg/640px-Power_outage.jpg"
+             onerror="this.src='https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600&q=80'"
+             alt="Power Cut" class="prob-img" loading="lazy">
+        <div class="prob-overlay"></div>
+        <div class="prob-tag">⚡ Electricity</div>
+      </div>
+      <div class="prob-body">
+        <h3>Power Cuts & Outages</h3>
+        <p>Frequent load-shedding disrupts businesses, students, and essential appliances across areas.</p>
+        <div class="prob-stat"><span class="prob-count">934</span> complaints this month</div>
+        <button class="prob-cta" onclick="fillComplaint('Frequent power cuts and load shedding disrupting daily life and work.')">Report This →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── COMPLAINT FORM ── -->
+<section class="form-section" id="complaintFormSection">
+  <div class="form-section-inner">
+    <div class="form-left">
+      <div class="section-eyebrow">📝 Submit Complaint</div>
+      <h2 class="section-heading">Make Your Voice Heard</h2>
+      <p class="section-sub">Use the form or <strong>speak your complaint</strong> using the voice button — we'll transcribe it automatically.</p>
+      <div class="form-perks">
+        <div class="perk"><span class="perk-icon">🔒</span> Secure & Private</div>
+        <div class="perk"><span class="perk-icon">⚡</span> Instant ID Generated</div>
+        <div class="perk"><span class="perk-icon">📲</span> Track Anytime</div>
+        <div class="perk"><span class="perk-icon">🎙️</span> Voice Input Ready</div>
+      </div>
+    </div>
+    <div class="form-right">
+      <form id="complaintForm" class="complaint-form" autocomplete="off">
+        <div class="form-row">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="e.g. sadiya" required>
+          </div>
+          <div class="field">
+            <label>Mobile Number</label>
+            <input type="tel" id="mobile" placeholder="e.g. 9876543210" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>Area / Location</label>
+          <input type="text" id="area" placeholder="e.g. Bijnor, Ward 4" required>
+        </div>
+        <!-- Voice Textarea -->
+        <div class="field">
+          <div class="desc-label-row">
+            <label>Describe Your Issue</label>
+            <button type="button" class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Click to speak">
+              <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+              <span id="voiceBtnLabel">Speak</span>
+            </button>
+          </div>
+          <div class="textarea-wrap">
+            <textarea id="description" rows="4" placeholder="Describe your complaint in detail... or click 🎙 Speak to use your voice!" required></textarea>
+            <div class="voice-wave" id="voiceWave">
+              <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <span class="wave-label">Listening…</span>
+            </div>
+          </div>
+          <div class="voice-status" id="voiceStatus"></div>
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span id="submitLabel">Submit Complaint</span>
+          <div id="submitLoader" class="btn-loader hidden"></div>
+        </button>
+      </form>
+      <!-- Success Result -->
+      <div id="successBox" class="success-box hidden">
+        <div class="success-icon">🎉</div>
+        <h3>Complaint Submitted!</h3>
+        <p>Your complaint has been registered. Use the ID below to track status.</p>
+        <div class="id-display">
+          <code id="trackingIdDisplay"></code>
+          <button class="copy-id-btn" onclick="copyTrackingId()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy</span>
+          </button>
+        </div>
+        <button class="btn-new" onclick="resetForm()">+ New Complaint</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TRACK SECTION ── -->
+<section class="track-section" id="trackSection">
+  <div class="track-inner">
+    <div class="section-eyebrow">🔍 Track Status</div>
+    <h2 class="section-heading">Check Your Complaint</h2>
+    <p class="section-sub">Enter your Tracking ID to see real-time status of your complaint.</p>
+    <div class="track-box">
+      <div class="track-input-row">
+        <input type="text" id="trackInput" placeholder="Enter your Tracking ID (e.g. PCRM1234567890)" class="track-inp">
+        <button class="track-btn" onclick="trackComplaint()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Check
+        </button>
+      </div>
+      <div id="trackResult" class="track-result hidden"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="how-section">
+  <div class="section-eyebrow">Simple Process</div>
+  <h2 class="section-heading">How P-CRM Works</h2>
+  <div class="steps-row">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-icon">📝</div>
+      <h3>Submit</h3>
+      <p>Fill the form or speak your complaint using voice recognition.</p>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div class="step-icon">🆔</div>
+      <h3>Get ID</h3>
+      <p>Receive a unique tracking ID instantly after submission.</p>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div class="step-icon">⚙️</div>
+      <h3>Admin Reviews</h3>
+      <p>Our admin team reviews and assigns resolution teams.</p>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step-card">
+      <div class="step-num">04</div>
+      <div class="step-icon">✅</div>
+      <h3>Resolved</h3>
+      <p>You get notified when your complaint is resolved.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo">⚡ P-CRM</div>
+      <p>Empowering citizens of Uttar Pradesh with transparent, efficient digital governance.</p>
+    </div>
+    <div class="footer-links-col">
+      <h4>Navigate</h4>
+      <a href="#home">Home</a>
+      <a href="#problems">Issues</a>
+      <a href="#complaintFormSection">Submit</a>
+      <a href="#trackSection">Track</a>
+      <a href="admin.html">Admin</a>
+    </div>
+    <div class="footer-links-col">
+      <h4>Legal</h4>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 P-CRM — Smart Political CRM. All rights reserved.</span>
+    <span>Made for the people of Bijnor, UP 🇮🇳</span>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
